@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".HorrorActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="match_parent"
+            android:layout_height="77dp"
+            android:gravity="center"
+            android:text="恐怖片" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="136dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="最新上映" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/movie_1"
+                    android:layout_width="match_parent"
+                    android:layout_height="67dp" />
+
+                <TextView
+                    android:id="@+id/movie_2"
+                    android:layout_width="match_parent"
+                    android:layout_height="69dp" />
+
+                <TextView
+                    android:id="@+id/movie_3"
+                    android:layout_width="match_parent"
+                    android:layout_height="73dp" />
+
+                <TextView
+                    android:id="@+id/movie_4"
+                    android:layout_width="match_parent"
+                    android:layout_height="71dp" />
+
+                <TextView
+                    android:id="@+id/movie_5"
+                    android:layout_width="match_parent"
+                    android:layout_height="68dp" />
+
+                <TextView
+                    android:id="@+id/movie_6"
+                    android:layout_width="match_parent"
+                    android:layout_height="85dp" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</android.support.constraint.ConstraintLayout>
