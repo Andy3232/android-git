@@ -1,39 +1,31 @@
 {
   "project_info": {
-    "project_number": "787593088073",
-    "firebase_url": "https://movie-information-84a07.firebaseio.com",
-    "project_id": "movie-information-84a07",
-    "storage_bucket": "movie-information-84a07.appspot.com"
+    "project_number": "511520302142",
+    "firebase_url": "https://featuremovie-13368.firebaseio.com",
+    "project_id": "featuremovie-13368",
+    "storage_bucket": "featuremovie-13368.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:787593088073:android:bea8a12b4d175700",
+        "mobilesdk_app_id": "1:511520302142:android:bea8a12b4d175700",
         "android_client_info": {
           "package_name": "com.example.andy.myapplication5"
         }
       },
       "oauth_client": [
         {
-          "client_id": "787593088073-9r5p1at3mik6qfl993a52lr9kcboljp5.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.andy.myapplication5",
-            "certificate_hash": "0eca6a9b582d52ff8c7af2cffcf66f363f574e84"
-          }
-        },
-        {
-          "client_id": "787593088073-667k5du9ckigd7gsr19e7gas3ie3fel3.apps.googleusercontent.com",
+          "client_id": "511520302142-bbt1a891sfqdkp2c6ummc6nbssnakb9g.apps.googleusercontent.com",
           "client_type": 3
         },
         {
-          "client_id": "787593088073-667k5du9ckigd7gsr19e7gas3ie3fel3.apps.googleusercontent.com",
+          "client_id": "511520302142-bbt1a891sfqdkp2c6ummc6nbssnakb9g.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDwuwBE951F7jpi1tE1KhlgtgzcO7QHzPc"
+          "current_key": "AIzaSyD_fnJW23gT9-YZ-TU8FY4fsK5pLpXfEPY"
         }
       ],
       "services": {
@@ -41,13 +33,8 @@
           "status": 1
         },
         "appinvite_service": {
-          "status": 2,
-          "other_platform_oauth_client": [
-            {
-              "client_id": "787593088073-667k5du9ckigd7gsr19e7gas3ie3fel3.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "status": 1,
+          "other_platform_oauth_client": []
         },
         "ads_service": {
           "status": 2

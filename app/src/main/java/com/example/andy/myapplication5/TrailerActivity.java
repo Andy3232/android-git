@@ -9,15 +9,21 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.PopupMenu;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -33,41 +39,44 @@ import java.util.List;
 
 public class TrailerActivity extends AppCompatActivity {
 
-    private TrailerArrayAdapter adapter = null;
+    List<information> lsinformations = new ArrayList<>();
+    private InformationArrayAdapter adapter = null;
+    private static final int LIST_MOVIE = 1;
 
-    private static final int LIST_MOVIE1 = 1;
+    private ImageView btnBack;
+    private ImageButton btnMenu;
+    private ListView lvInformations;
+    private Boolean exist = true;
+    private static Bitmap passPic;
 
     private Handler handler = new Handler() {
         public void handleMessage(Message msg) {
             switch (msg.what) {
-                case LIST_MOVIE1: {
-                    List<trailer> trailers = (List<trailer>) msg.obj;
-                    refreshHotelList(trailers);
+                case LIST_MOVIE: {
+                    List<information> informations = (List<information>) msg.obj;
+                    refreshHotelList(informations);
                     break;
                 }
             }
         }
     };
 
-    private void refreshHotelList(List<trailer> trailers) {
+    private void refreshHotelList(List<information> informations) {
         adapter.clear();
 
-        adapter.addAll(trailers);
+        adapter.addAll(informations);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_trailer);
+        setContentView(R.layout.activity_information);
+        TextView title = (TextView) findViewById(R.id.tv_info_title);
 
-        ListView lvTrailers = (ListView) findViewById(R.id.listview_movie);
-
-
-        adapter = new TrailerArrayAdapter(this, new ArrayList<trailer>());
-        lvTrailers.setAdapter(adapter);
-
-        getTrailersFromFirebase();
-
+        title.setText("現正熱映");
+        setClick();
+        Toast.makeText(TrailerActivity.this, "載入中", Toast.LENGTH_SHORT).show();
+        getInformationsFromFirebase();
     }
 
     class FirebaseThread extends Thread {
@@ -80,29 +89,70 @@ public class TrailerActivity extends AppCompatActivity {
 
         @Override
         public void run() {
-            List<trailer> lstrailers = new ArrayList<>();
+            Log.d("GetData", "In");
+            int count = 0;
+            exist = true;
             for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                DataSnapshot dsUrl = ds.child("Description");
+                DataSnapshot dsNow = ds.child("NOW");
+                String now = (String) dsNow.getValue();
+                count++;
+                if (exist && now.equals("1")) {
+                    //get database date
+                    DataSnapshot dsDesc = ds.child("DESC");
+                    DataSnapshot dsName = ds.child("NAME");
+                    DataSnapshot dsPic = ds.child("PIC");
+                    DataSnapshot dsCast = ds.child("CAST");
+                    DataSnapshot dsYoutube = ds.child("YOUTUBE");
+                    DataSnapshot dsSort = ds.child("SORT");
+                    DataSnapshot dsDate = ds.child("DATE");
 
-                String Url = (String) dsUrl.getValue();
-                DataSnapshot dsImg = ds.child("Picture1");
-                String imgUrl = (String) dsImg.getValue();
-                Bitmap movieImg = getImgBitmap(imgUrl);
+                    //make each string
+                    String desc = (String) dsDesc.getValue();
+                    String name = (String) dsName.getValue();
+                    String picUrl = (String) dsPic.getValue();
+                    String cast = (String) dsCast.getValue();
+                    String youtube = (String) dsYoutube.getValue();
+                    String sort = (String) dsSort.getValue();
+                    String date = (String) dsDate.getValue();
 
-                trailer atrailer = new trailer();
-                atrailer.setUrl(Url);
-                atrailer.setImgUrl(movieImg);
-                lstrailers.add(atrailer);
-                Log.v("Trailer", imgUrl);
+                    Log.d("NAME", name);
+
+                    //turn bitmap
+                    Bitmap pic = getImgBitmap(picUrl);
+
+                    //create a information
+                    information ainformation = new information();
+                    ainformation.setCast(cast);
+                    ainformation.setDate(date);
+                    ainformation.setPic(pic);
+                    ainformation.setDesc(desc);
+                    ainformation.setName(name);
+                    ainformation.setSort(sort);
+                    ainformation.setYoutube(youtube);
+                    ainformation.setNow(now);
+
+                    lsinformations.add(ainformation);
+
+                } else {
+                    break;
+                }
+                if (count % 2 == 0) {
+                    Message msg = new Message();
+                    msg.what = LIST_MOVIE;
+                    msg.obj = lsinformations;
+                    handler.sendMessage(msg);
+                }
             }
-            Message msg = new Message();
-            msg.what = LIST_MOVIE1;
-            msg.obj = lstrailers;
-            handler.sendMessage(msg);
+            if (count % 2 != 0) {
+                Message msg = new Message();
+                msg.what = LIST_MOVIE;
+                msg.obj = lsinformations;
+                handler.sendMessage(msg);
+            }
         }
     }
 
-    private void getTrailersFromFirebase() {
+    private void getInformationsFromFirebase() {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference();
         myRef.addValueEventListener(new ValueEventListener() {
@@ -114,7 +164,7 @@ public class TrailerActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Log.v("Trailer", databaseError.getMessage());
+                Log.v("Information", databaseError.getMessage());
             }
         });
     }
@@ -132,11 +182,104 @@ public class TrailerActivity extends AppCompatActivity {
         return null;
     }
 
+    private void setClick() {
+        btnMenu = (ImageButton) findViewById(R.id.btn_movielist_menu);
+        btnBack = (ImageView) findViewById(R.id.btn_movielist_back);
 
-    class TrailerArrayAdapter extends ArrayAdapter<trailer> {
+        //back
+        btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
+        //menu
+        btnMenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final PopupMenu popupmenu = new PopupMenu(TrailerActivity.this, v);
+
+                popupmenu.getMenuInflater().inflate(R.menu.menu, popupmenu.getMenu());
+                popupmenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.action_1:
+                                Intent intent = new Intent();
+                                intent.setClass(TrailerActivity.this, MainActivity.class);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                startActivity(intent);
+                                finish();
+                                break;
+                            case R.id.action_2:
+
+                                break;
+                        }
+                        return true;
+                    }
+
+                });
+                popupmenu.show();
+            }
+        });
+
+        //list
+        lvInformations = (ListView) findViewById(R.id.listview_movie);
+        adapter = new InformationArrayAdapter(this, new ArrayList<information>());
+        lvInformations.setAdapter(adapter);
+
+        //set list click
+        lvInformations.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent();
+                intent.setClass(TrailerActivity.this, MovieActivity.class);
+                String name = lsinformations.get(position).getName();
+                String desc = lsinformations.get(position).getDesc();
+                String youtube = lsinformations.get(position).getYoutube();
+                String cast = lsinformations.get(position).getCast();
+                Bitmap pic = lsinformations.get(position).getPic();
+
+                intent.putExtra("WHERE", "HOT");
+                intent.putExtra("DESC", desc);
+                intent.putExtra("YOUTUBE", youtube);
+                intent.putExtra("CAST", cast);
+                //intent.putExtra("PIC", pic);
+                passPic = pic;
+                intent.putExtra("NAME", name);
+                Log.d("Click", String.valueOf(position));
+                startActivity(intent);
+            }
+        });
+
+    }
+
+    @Override
+    protected void onPause() {
+        Log.d("PAUSE","123");
+        exist = false;
+        super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        Log.d("DEST","Info");
+        exist = false;
+        lsinformations.clear();
+        adapter.clear();
+        super.onDestroy();
+    }
+
+    public static Bitmap getPassPic() {
+        return passPic;
+    }
+
+    class InformationArrayAdapter extends ArrayAdapter<information> {
         Context context;
 
-        public TrailerArrayAdapter(Context context, List<trailer> items) {
+        public InformationArrayAdapter(Context context, List<information> items) {
             super(context, 0, items);
             this.context = context;
         }
@@ -146,24 +289,40 @@ public class TrailerActivity extends AppCompatActivity {
             LayoutInflater inflater = LayoutInflater.from(context);
             LinearLayout itemlayout = null;
             if (convertView == null) {
-                itemlayout = (LinearLayout) inflater.inflate(R.layout.trailer_layout, null);
+                itemlayout = (LinearLayout) inflater.inflate(R.layout.information_layout, null);
             } else {
                 itemlayout = (LinearLayout) convertView;
             }
-            final trailer item = (trailer) getItem(position);
-            ImageView ivmovie = (ImageView) itemlayout.findViewById(R.id.iv_movie1);
-            ivmovie.setImageBitmap(item.getImgUrl());
-            Button trailerPageBtn = (Button)itemlayout.findViewById(R.id.trailer_btn1);
-            trailerPageBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent i = new Intent(Intent.ACTION_VIEW);
-                    i.setData(Uri.parse("https://www.youtube.com"));
-                    startActivity(i);
-                }
-            });
 
+            information item = (information) getItem(position);
+            TextView tvName = (TextView) itemlayout.findViewById(R.id.tv_name);
+            TextView tvDate = (TextView) itemlayout.findViewById(R.id.tv_date);
+            TextView tvSort = (TextView) itemlayout.findViewById(R.id.tv_sort);
+
+            tvName.setText(item.getName());
+            switch(item.getNow()) {
+                case"0":
+                    tvDate.setText("上映日期: " + item.getDate());
+                    tvDate.setTextColor(0xFF000000);
+                    break;
+                case "1":
+                    tvDate.setText("現正上映中");
+                    tvDate.setTextColor(0xFFFF0000);
+                    break;
+                default:
+                    tvDate.setText("上映日期: " + item.getDate());
+            }
+
+            tvSort.setText(item.getSort());
+
+
+            ImageView ivmovie = (ImageView) itemlayout.findViewById(R.id.iv_movie);
+            ivmovie.setImageBitmap(item.getPic());
             return itemlayout;
         }
+    }
+
+    public static void setPassPic(Bitmap passPic) {
+        TrailerActivity.passPic = passPic;
     }
 }
