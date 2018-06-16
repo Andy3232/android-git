@@ -1,19 +1,29 @@
 package com.example.andy.myapplication5;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.PopupMenu;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-public class MovieActivity extends AppCompatActivity {
+import com.google.android.youtube.player.YouTubeBaseActivity;
+import com.google.android.youtube.player.YouTubeInitializationResult;
+import com.google.android.youtube.player.YouTubePlayer;
+import com.google.android.youtube.player.YouTubePlayerView;
+
+public class MovieActivity  extends YouTubeBaseActivity implements YouTubePlayer.OnInitializedListener {
 
     private TextView title;
     private ImageView btn_back;
@@ -25,6 +35,13 @@ public class MovieActivity extends AppCompatActivity {
     private ImageView img_pic;
     private TextView tv_cast;
     private TextView tv_desc;
+
+    //Youtube
+    public static final String API_KEY = "AIzaSyCRzFbaJ9BMMuwPGOhcBRxUcYGU28J0UMA";
+    //https://www.youtube.com/watch?v=<video_id>
+    public String VIDEO_ID = "OsUr8N7t4zc";
+    YouTubePlayer y2;
+    private YouTubePlayerView mYoutubePlayerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +62,10 @@ public class MovieActivity extends AppCompatActivity {
         img_pic = (ImageView) findViewById(R.id.img_movie_pic);
         tv_desc = (TextView) findViewById(R.id.tv_desc);
         tv_cast = (TextView) findViewById(R.id.tv_cast);
+
+        btn_back.setImageResource(R.drawable.ic_back);
+        btn_menu.setImageResource(R.drawable.ic_menuwhite);
+        btn_like.setImageResource(R.drawable.ic_startempty);
 
         Intent intent = getIntent();
         //title
@@ -107,6 +128,37 @@ public class MovieActivity extends AppCompatActivity {
 
         //youtube
         String youtube = intent.getStringExtra("YOUTUBE");
+        VIDEO_ID = youtube.substring(youtube.indexOf('=') + 1);
+        btn_youtube.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                LayoutInflater inflater = LayoutInflater.from(MovieActivity.this);
+                final View alert_view = inflater.inflate(R.layout.dialog_youtube,null);//alert為另外做給alert用的layout
+
+                //-----------產生輸入視窗--------
+                AlertDialog.Builder builder = new AlertDialog.Builder(MovieActivity.this);
+                builder.setView(alert_view);
+                builder.setCancelable(false);
+
+                //alert.xml上的元件 要用屬於元件的view.才可以不然會FC也就是要加alert_view.findViewById
+                mYoutubePlayerView = (YouTubePlayerView) alert_view.findViewById(R.id.youtube);
+                mYoutubePlayerView.initialize(API_KEY, MovieActivity.this);
+
+                AlertDialog dialog = builder.create();
+
+                dialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
+                    @Override
+                    public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+                        if (keyCode == KeyEvent.KEYCODE_BACK) {
+                            y2.release();
+                            dialog.cancel();
+                        }
+                        return false;
+                    }
+                });
+                dialog.show();
+            }
+        });
 
         //back
         btn_back.setOnClickListener(new View.OnClickListener() {
@@ -146,5 +198,32 @@ public class MovieActivity extends AppCompatActivity {
                 popupmenu.show();
             }
         });
+    }
+
+    @Override
+    public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer youTubePlayer, boolean wasRestored) {
+        //Toast.makeText(this, "onInitializationSuccess!", Toast.LENGTH_SHORT).show();
+        y2 = youTubePlayer;
+        if (youTubePlayer == null) {
+            Log.d("CheckPoint", "CheckPoint youtubePlayer == null");
+            return;
+        }
+
+        if (!wasRestored) {
+            Log.d("CheckPoint", "CheckPoint !wasRestored");
+            youTubePlayer.cueVideo(VIDEO_ID);
+            youTubePlayer.setFullscreenControlFlags(YouTubePlayer.FULLSCREEN_FLAG_CUSTOM_LAYOUT);
+
+            youTubePlayer.setOnFullscreenListener(new YouTubePlayer.OnFullscreenListener(){
+                @Override
+                public void onFullscreen(boolean arg0) {
+                    Toast.makeText(MovieActivity.this, "不支援全螢幕模式", Toast.LENGTH_SHORT).show();
+                }});
+        }
+    }
+
+    @Override
+    public void onInitializationFailure(YouTubePlayer.Provider provider, YouTubeInitializationResult youTubeInitializationResult) {
+        //Toast.makeText(this, "Failed to initialize.", Toast.LENGTH_LONG).show();
     }
 }

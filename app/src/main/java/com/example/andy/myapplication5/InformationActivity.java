@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -72,7 +74,15 @@ public class InformationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_information);
 
-        Toast.makeText(InformationActivity.this, "載入中", Toast.LENGTH_SHORT).show();
+        //檢查網路連線
+        ConnectivityManager mConnectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo mNetworkInfo = mConnectivityManager.getActiveNetworkInfo();
+
+        if (mNetworkInfo != null) {
+            Toast.makeText(InformationActivity.this, "載入中", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(InformationActivity.this, "沒有網路連線", Toast.LENGTH_SHORT).show();
+        }
 
         setClick();
         getInformationsFromFirebase();

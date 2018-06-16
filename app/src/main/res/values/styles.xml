@@ -6,6 +6,12 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="textAppearanceLargePopupMenu">@style/NightAppTheme.popMenuStyle.textAppearanceLargePopupMenu</item>
+    </style>
+
+
+    <style name="NightAppTheme.popMenuStyle.textAppearanceLargePopupMenu" parent="@style/TextAppearance.AppCompat.Light.Widget.PopupMenu.Large">
+        <item name="android:textColor">@android:color/holo_blue_dark</item>
     </style>
 
 </resources>

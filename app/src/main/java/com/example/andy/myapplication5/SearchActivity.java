@@ -5,16 +5,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -135,16 +139,57 @@ public class SearchActivity extends AppCompatActivity {
         btnSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                lsinformations = new ArrayList<>();//
-                String pre = input;
-                input = etSearch.getText().toString().trim().toUpperCase();
-                if (!pre.equals(input.trim()) && input.trim().length() > 0) {
-                    getInformationsFromFirebase();
-                } else if (input.trim().length() == 0) {
-                    Toast.makeText(SearchActivity.this, "請輸入電影名稱!!", Toast.LENGTH_SHORT).show();
+
+                //檢查網路連線
+                ConnectivityManager mConnectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+                NetworkInfo mNetworkInfo = mConnectivityManager.getActiveNetworkInfo();
+
+                if (mNetworkInfo != null) {
+                    lsinformations = new ArrayList<>();//
+                    String pre = input;
+                    input = etSearch.getText().toString().trim().toUpperCase();
+                    if (!pre.equals(input.trim()) && input.trim().length() > 0) {
+                        getInformationsFromFirebase();
+                    } else if (input.trim().length() == 0) {
+                        Toast.makeText(SearchActivity.this, "請輸入電影名稱!!", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(SearchActivity.this, "沒有網路連線", Toast.LENGTH_SHORT).show();
                 }
             }
         });
+
+        //et_search listener
+        etSearch.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                //当actionId == XX_SEND 或者 XX_DONE时都触发
+                //或者event.getKeyCode == ENTER 且 event.getAction == ACTION_DOWN时也触发
+                //注意，这是一定要判断event != null。因为在某些输入法上会返回null。
+                if (actionId == EditorInfo.IME_ACTION_SEND || actionId == EditorInfo.IME_ACTION_DONE || (event != null && KeyEvent.KEYCODE_ENTER == event.getKeyCode() && KeyEvent.ACTION_DOWN == event.getAction())) {
+
+                    //檢查網路連線
+                    ConnectivityManager mConnectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+                    NetworkInfo mNetworkInfo = mConnectivityManager.getActiveNetworkInfo();
+
+                    if (mNetworkInfo != null) {
+                        lsinformations = new ArrayList<>();
+                        String pre = input;
+                        input = etSearch.getText().toString().trim().toUpperCase();
+                        if (!pre.equals(input.trim()) && input.trim().length() > 0) {
+                            getInformationsFromFirebase();
+                        } else if (input.trim().length() == 0) {
+                            Toast.makeText(SearchActivity.this, "請輸入電影名稱!!", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Toast.makeText(SearchActivity.this, "沒有網路連線", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                return false;
+            }
+        });
+
 
         //list
         lvInformations = (ListView) findViewById(R.id.list_search);
@@ -163,7 +208,7 @@ public class SearchActivity extends AppCompatActivity {
                 String cast = lsinformations.get(position).getCast();
                 Bitmap pic = lsinformations.get(position).getPic();
 
-                intent.putExtra("WHERE","SEARCH");
+                intent.putExtra("WHERE", "SEARCH");
                 intent.putExtra("DESC", desc);
                 intent.putExtra("YOUTUBE", youtube);
                 intent.putExtra("CAST", cast);
@@ -204,6 +249,7 @@ public class SearchActivity extends AppCompatActivity {
                     DataSnapshot dsYoutube = ds.child("YOUTUBE");
                     DataSnapshot dsSort = ds.child("SORT");
                     DataSnapshot dsDate = ds.child("DATE");
+                    DataSnapshot dsNow = ds.child("NOW");
 
                     //make each string
                     String desc = (String) dsDesc.getValue();
@@ -212,6 +258,7 @@ public class SearchActivity extends AppCompatActivity {
                     String youtube = (String) dsYoutube.getValue();
                     String sort = (String) dsSort.getValue();
                     String date = (String) dsDate.getValue();
+                    String now = (String) dsNow.getValue();
                     Log.d("NAME", name);
                     //turn bitmap
                     Bitmap pic = getImgBitmap(picUrl);
@@ -225,6 +272,7 @@ public class SearchActivity extends AppCompatActivity {
                     ainformation.setPic(pic);
                     ainformation.setSort(sort);
                     ainformation.setYoutube(youtube);
+                    ainformation.setNow(now);
 
                     lsinformations.add(ainformation);
                 }
@@ -298,7 +346,20 @@ public class SearchActivity extends AppCompatActivity {
             TextView tvName = (TextView) itemlayout.findViewById(R.id.tv_name);
             TextView tvDate = (TextView) itemlayout.findViewById(R.id.tv_date);
             tvName.setText(item.getName());
-            tvDate.setText("上映日期: " + item.getDate());
+
+            switch (item.getNow()) {
+                case "0":
+                    tvDate.setText("上映日期: " + item.getDate());
+                    tvDate.setTextColor(0xFF000000);
+                    break;
+                case "1":
+                    tvDate.setText("現正上映中");
+                    tvDate.setTextColor(0xFFFF0000);
+                    break;
+                default:
+                    tvDate.setText("上映日期: " + item.getDate());
+            }
+
             TextView tvSort = (TextView) itemlayout.findViewById(R.id.tv_sort);
             tvSort.setText(item.getSort());
             ImageView ivmovie = (ImageView) itemlayout.findViewById(R.id.iv_movie);

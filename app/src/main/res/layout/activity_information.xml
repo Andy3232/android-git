@@ -4,21 +4,22 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/background3"
     android:gravity="center_horizontal"
     android:orientation="vertical">
 
     <LinearLayout
-        android:id="@+id/lo_movie"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
-        android:gravity="center"
         android:orientation="horizontal">
 
         <ImageView
             android:id="@+id/btn_movielist_back"
             android:layout_width="50dp"
             android:layout_height="50dp"
+            android:paddingBottom="4dp"
+            android:paddingTop="6dp"
             app:srcCompat="@drawable/ic_back" />
 
         <TextView
@@ -26,9 +27,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginLeft="10dp"
             android:layout_weight="1"
-            android:background="@color/colorPrimary"
             android:gravity="center"
             android:text="電影列表"
             android:textColor="#ffffff"
@@ -36,10 +35,10 @@
 
         <ImageButton
             android:id="@+id/btn_movielist_menu"
-            android:layout_width="60sp"
-            android:layout_height="60sp"
-            android:background="@color/colorPrimary"
-            app:srcCompat="@drawable/ic_menu" />
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="#00000000"
+            app:srcCompat="@drawable/ic_menuwhite" />
     </LinearLayout>
 
     <LinearLayout

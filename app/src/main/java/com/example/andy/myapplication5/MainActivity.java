@@ -31,15 +31,12 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 final PopupMenu popupmenu = new PopupMenu(MainActivity.this, v);
 
-                popupmenu.getMenuInflater().inflate(R.menu.menu, popupmenu.getMenu());
+                popupmenu.getMenuInflater().inflate(R.menu.main_menu, popupmenu.getMenu());
                 popupmenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
 
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
                         switch (item.getItemId()) {
-                            case R.id.action_1:
-
-                                break;
                             case R.id.action_2:
 
                                 break;

@@ -11,19 +11,26 @@
         android:theme="@style/AppTheme"
         android:hardwareAccelerated="false"
         android:largeHeap="true">
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".InformationActivity" />
-        <activity android:name=".TrailerActivity" />
-        <activity android:name=".SortActivity" />
-        <activity android:name=".HorrorActivity" />
-        <activity android:name=".SearchActivity" />
-        <activity android:name=".MovieActivity"></activity>
+        <activity android:name=".InformationActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".TrailerActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".SortActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".HorrorActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".SearchActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".MovieActivity"
+            android:screenOrientation="portrait"></activity>
     </application>
 
 </manifest>

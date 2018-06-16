@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/background3"
     android:gravity="center_horizontal"
     android:orientation="vertical">
 
@@ -19,15 +20,15 @@
             android:id="@+id/btn_search_back"
             android:layout_width="50dp"
             android:layout_height="50dp"
+            android:paddingBottom="4dp"
+            android:paddingTop="6dp"
             app:srcCompat="@drawable/ic_back" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginLeft="10dp"
             android:layout_weight="1"
-            android:background="@color/colorPrimary"
             android:gravity="center"
             android:text="搜尋"
             android:textColor="#ffffff"
@@ -35,10 +36,10 @@
 
         <ImageButton
             android:id="@+id/btn_search_menu"
-            android:layout_width="60sp"
-            android:layout_height="60sp"
-            android:background="@color/colorPrimary"
-            app:srcCompat="@drawable/ic_menu" />
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="#00000000"
+            app:srcCompat="@drawable/ic_menuwhite" />
 
     </LinearLayout>
 
@@ -54,6 +55,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="#EEEEEE"
             android:gravity="right"
             android:orientation="horizontal">
 
@@ -66,6 +68,7 @@
                 android:ems="10"
                 android:hint="請輸入電影名稱"
                 android:singleLine="true"
+                android:textColorLink="#000000"
                 android:textSize="24sp" />
 
             <ImageButton
@@ -78,9 +81,10 @@
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
+            android:background="#FFFFFF"
             android:letterSpacing="10"
             android:orientation="horizontal">
 
@@ -96,7 +100,7 @@
         <ListView
             android:id="@+id/list_search"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" >
+            android:layout_height="match_parent">
 
         </ListView>
     </LinearLayout>
