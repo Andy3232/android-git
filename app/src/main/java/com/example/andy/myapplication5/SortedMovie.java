@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -18,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -31,15 +33,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import org.w3c.dom.Text;
-
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class InformationActivity extends AppCompatActivity {
+public class SortedMovie extends AppCompatActivity {
 
     List<information> lsinformations = new ArrayList<>();
     private InformationArrayAdapter adapter = null;
@@ -50,6 +50,7 @@ public class InformationActivity extends AppCompatActivity {
     private ListView lvInformations;
     private Boolean exist = true;
     private static Bitmap passPic;
+    private String wantedSort;
 
     private Handler handler = new Handler() {
         public void handleMessage(Message msg) {
@@ -73,18 +74,24 @@ public class InformationActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_information);
+        TextView title = (TextView) findViewById(R.id.tv_info_title);
+
+        Intent intent = getIntent();
+        wantedSort = intent.getStringExtra("SORT");
+
+        title.setText(wantedSort);
+        setClick();
 
         //檢查網路連線
         ConnectivityManager mConnectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo mNetworkInfo = mConnectivityManager.getActiveNetworkInfo();
 
         if (mNetworkInfo != null) {
-            Toast.makeText(InformationActivity.this, "載入中", Toast.LENGTH_SHORT).show();
+            Toast.makeText(SortedMovie.this, "載入中", Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(InformationActivity.this, "沒有網路連線", Toast.LENGTH_SHORT).show();
+            Toast.makeText(SortedMovie.this, "沒有網路連線", Toast.LENGTH_SHORT).show();
         }
 
-        setClick();
         getInformationsFromFirebase();
     }
 
@@ -102,15 +109,18 @@ public class InformationActivity extends AppCompatActivity {
             int count = 0;
             exist = true;
             for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                count++;
-                if (exist) {
+                DataSnapshot dsSort = ds.child("SORT");
+                String sort = (String) dsSort.getValue();
+                Log.d("GetSort", sort);
+                if (exist && sort.indexOf(wantedSort) > -1) {
                     //get database date
+                    count++;
                     DataSnapshot dsDesc = ds.child("DESC");
                     DataSnapshot dsName = ds.child("NAME");
                     DataSnapshot dsPic = ds.child("PIC");
                     DataSnapshot dsCast = ds.child("CAST");
                     DataSnapshot dsYoutube = ds.child("YOUTUBE");
-                    DataSnapshot dsSort = ds.child("SORT");
+
                     DataSnapshot dsDate = ds.child("DATE");
                     DataSnapshot dsNow = ds.child("NOW");
 
@@ -120,9 +130,9 @@ public class InformationActivity extends AppCompatActivity {
                     String picUrl = (String) dsPic.getValue();
                     String cast = (String) dsCast.getValue();
                     String youtube = (String) dsYoutube.getValue();
-                    String sort = (String) dsSort.getValue();
                     String date = (String) dsDate.getValue();
                     String now = (String) dsNow.getValue();
+
                     Log.d("NAME", name);
 
                     //turn bitmap
@@ -142,8 +152,6 @@ public class InformationActivity extends AppCompatActivity {
 
                     lsinformations.add(ainformation);
 
-                } else {
-                    break;
                 }
                 if (count % 2 == 0) {
                     Message msg = new Message();
@@ -168,7 +176,7 @@ public class InformationActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 DataSnapshot value = dataSnapshot;
-                new FirebaseThread(dataSnapshot).start();
+                new SortedMovie.FirebaseThread(dataSnapshot).start();
             }
 
             @Override
@@ -207,7 +215,7 @@ public class InformationActivity extends AppCompatActivity {
         btnMenu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final PopupMenu popupmenu = new PopupMenu(InformationActivity.this, v);
+                final PopupMenu popupmenu = new PopupMenu(SortedMovie.this, v);
 
                 popupmenu.getMenuInflater().inflate(R.menu.menu, popupmenu.getMenu());
                 popupmenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
@@ -218,17 +226,18 @@ public class InformationActivity extends AppCompatActivity {
                         switch (item.getItemId()) {
                             case R.id.action_1:
                                 intent = new Intent();
-                                intent.setClass(InformationActivity.this, MainActivity.class);
+                                intent.setClass(SortedMovie.this, MainActivity.class);
                                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                                 startActivity(intent);
                                 finish();
                                 break;
                             case R.id.action_2:
                                 intent = new Intent();
-                                intent.setClass(InformationActivity.this, LikeActivity.class);
+                                intent.setClass(SortedMovie.this, LikeActivity.class);
                                 startActivity(intent);
                                 break;
                             case R.id.action_3:
+                                //about
                                 break;
                         }
                         return true;
@@ -249,7 +258,7 @@ public class InformationActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent();
-                intent.setClass(InformationActivity.this, MovieActivity.class);
+                intent.setClass(SortedMovie.this, MovieActivity.class);
                 String name = lsinformations.get(position).getName();
                 String desc = lsinformations.get(position).getDesc();
                 String youtube = lsinformations.get(position).getYoutube();
@@ -257,7 +266,7 @@ public class InformationActivity extends AppCompatActivity {
                 String picUrl = lsinformations.get(position).getPicUrl();
                 Bitmap pic = lsinformations.get(position).getPic();
 
-                intent.putExtra("WHERE", "INFO");
+                intent.putExtra("WHERE", "SORT");
                 intent.putExtra("DESC", desc);
                 intent.putExtra("YOUTUBE", youtube);
                 intent.putExtra("CAST", cast);
@@ -290,10 +299,6 @@ public class InformationActivity extends AppCompatActivity {
 
     public static Bitmap getPassPic() {
         return passPic;
-    }
-
-    public static void setPassPic(Bitmap passPic) {
-        InformationActivity.passPic = passPic;
     }
 
     class InformationArrayAdapter extends ArrayAdapter<information> {
@@ -340,5 +345,9 @@ public class InformationActivity extends AppCompatActivity {
             ivmovie.setImageBitmap(item.getPic());
             return itemlayout;
         }
+    }
+
+    public static void setPassPic(Bitmap passPic) {
+        SortedMovie.passPic = passPic;
     }
 }

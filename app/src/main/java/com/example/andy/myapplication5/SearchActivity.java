@@ -106,9 +106,10 @@ public class SearchActivity extends AppCompatActivity {
 
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
+                        Intent intent;
                         switch (item.getItemId()) {
                             case R.id.action_1:
-                                Intent intent = new Intent();
+                                intent = new Intent();
                                 intent.setClass(SearchActivity.this, MainActivity.class);
                                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                                 startActivity(intent);
@@ -116,7 +117,12 @@ public class SearchActivity extends AppCompatActivity {
                                 finish();
                                 break;
                             case R.id.action_2:
-
+                                intent = new Intent();
+                                intent.setClass(SearchActivity.this, LikeActivity.class);
+                                startActivity(intent);
+                                break;
+                            case R.id.action_3:
+                                //about
                                 break;
                         }
                         return true;
@@ -206,12 +212,14 @@ public class SearchActivity extends AppCompatActivity {
                 String desc = lsinformations.get(position).getDesc();
                 String youtube = lsinformations.get(position).getYoutube();
                 String cast = lsinformations.get(position).getCast();
+                String picUrl = lsinformations.get(position).getPicUrl();
                 Bitmap pic = lsinformations.get(position).getPic();
 
                 intent.putExtra("WHERE", "SEARCH");
                 intent.putExtra("DESC", desc);
                 intent.putExtra("YOUTUBE", youtube);
                 intent.putExtra("CAST", cast);
+                intent.putExtra("PICURL", picUrl);
                 //intent.putExtra("PIC", pic);
                 passPic = pic;
                 intent.putExtra("NAME", name);
@@ -273,6 +281,7 @@ public class SearchActivity extends AppCompatActivity {
                     ainformation.setSort(sort);
                     ainformation.setYoutube(youtube);
                     ainformation.setNow(now);
+                    ainformation.setPicUrl(picUrl);
 
                     lsinformations.add(ainformation);
                 }

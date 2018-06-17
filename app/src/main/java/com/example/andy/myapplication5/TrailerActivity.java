@@ -105,48 +105,49 @@ public class TrailerActivity extends AppCompatActivity {
             int count = 0;
             exist = true;
             for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                DataSnapshot dsNow = ds.child("NOW");
-                String now = (String) dsNow.getValue();
-                count++;
-                if (exist && now.equals("1")) {
-                    //get database date
-                    DataSnapshot dsDesc = ds.child("DESC");
-                    DataSnapshot dsName = ds.child("NAME");
-                    DataSnapshot dsPic = ds.child("PIC");
-                    DataSnapshot dsCast = ds.child("CAST");
-                    DataSnapshot dsYoutube = ds.child("YOUTUBE");
-                    DataSnapshot dsSort = ds.child("SORT");
-                    DataSnapshot dsDate = ds.child("DATE");
+                if (exist) {
+                    DataSnapshot dsNow = ds.child("NOW");
+                    String now = (String) dsNow.getValue();
+                    if ( now.equals("1")) {
+                        count++;
 
-                    //make each string
-                    String desc = (String) dsDesc.getValue();
-                    String name = (String) dsName.getValue();
-                    String picUrl = (String) dsPic.getValue();
-                    String cast = (String) dsCast.getValue();
-                    String youtube = (String) dsYoutube.getValue();
-                    String sort = (String) dsSort.getValue();
-                    String date = (String) dsDate.getValue();
+                        //get database date
+                        DataSnapshot dsDesc = ds.child("DESC");
+                        DataSnapshot dsName = ds.child("NAME");
+                        DataSnapshot dsPic = ds.child("PIC");
+                        DataSnapshot dsCast = ds.child("CAST");
+                        DataSnapshot dsYoutube = ds.child("YOUTUBE");
+                        DataSnapshot dsSort = ds.child("SORT");
+                        DataSnapshot dsDate = ds.child("DATE");
 
-                    Log.d("NAME", name);
+                        //make each string
+                        String desc = (String) dsDesc.getValue();
+                        String name = (String) dsName.getValue();
+                        String picUrl = (String) dsPic.getValue();
+                        String cast = (String) dsCast.getValue();
+                        String youtube = (String) dsYoutube.getValue();
+                        String sort = (String) dsSort.getValue();
+                        String date = (String) dsDate.getValue();
 
-                    //turn bitmap
-                    Bitmap pic = getImgBitmap(picUrl);
+                        Log.d("NAME", name);
 
-                    //create a information
-                    information ainformation = new information();
-                    ainformation.setCast(cast);
-                    ainformation.setDate(date);
-                    ainformation.setPic(pic);
-                    ainformation.setDesc(desc);
-                    ainformation.setName(name);
-                    ainformation.setSort(sort);
-                    ainformation.setYoutube(youtube);
-                    ainformation.setNow(now);
+                        //turn bitmap
+                        Bitmap pic = getImgBitmap(picUrl);
 
-                    lsinformations.add(ainformation);
+                        //create a information
+                        information ainformation = new information();
+                        ainformation.setCast(cast);
+                        ainformation.setDate(date);
+                        ainformation.setPic(pic);
+                        ainformation.setDesc(desc);
+                        ainformation.setName(name);
+                        ainformation.setSort(sort);
+                        ainformation.setYoutube(youtube);
+                        ainformation.setNow(now);
+                        ainformation.setPicUrl(picUrl);
 
-                } else {
-                    break;
+                        lsinformations.add(ainformation);
+                    }
                 }
                 if (count % 2 == 0) {
                     Message msg = new Message();
@@ -217,16 +218,22 @@ public class TrailerActivity extends AppCompatActivity {
 
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
+                        Intent intent;
                         switch (item.getItemId()) {
                             case R.id.action_1:
-                                Intent intent = new Intent();
+                                intent = new Intent();
                                 intent.setClass(TrailerActivity.this, MainActivity.class);
                                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                                 startActivity(intent);
                                 finish();
                                 break;
                             case R.id.action_2:
-
+                                intent = new Intent();
+                                intent.setClass(TrailerActivity.this, LikeActivity.class);
+                                startActivity(intent);
+                                break;
+                            case R.id.action_3:
+                                //about
                                 break;
                         }
                         return true;
@@ -252,12 +259,14 @@ public class TrailerActivity extends AppCompatActivity {
                 String desc = lsinformations.get(position).getDesc();
                 String youtube = lsinformations.get(position).getYoutube();
                 String cast = lsinformations.get(position).getCast();
+                String picUrl = lsinformations.get(position).getPicUrl();
                 Bitmap pic = lsinformations.get(position).getPic();
 
                 intent.putExtra("WHERE", "HOT");
                 intent.putExtra("DESC", desc);
                 intent.putExtra("YOUTUBE", youtube);
                 intent.putExtra("CAST", cast);
+                intent.putExtra("PICURL", picUrl);
                 //intent.putExtra("PIC", pic);
                 passPic = pic;
                 intent.putExtra("NAME", name);

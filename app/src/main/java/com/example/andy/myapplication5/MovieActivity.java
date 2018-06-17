@@ -1,7 +1,10 @@
 package com.example.andy.myapplication5;
 
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -24,7 +27,7 @@ import com.google.android.youtube.player.YouTubePlayer;
 import com.google.android.youtube.player.YouTubePlayerView;
 
 public class MovieActivity  extends YouTubeBaseActivity implements YouTubePlayer.OnInitializedListener {
-
+    //view
     private TextView title;
     private ImageView btn_back;
     private ImageButton btn_menu;
@@ -35,11 +38,18 @@ public class MovieActivity  extends YouTubeBaseActivity implements YouTubePlayer
     private ImageView img_pic;
     private TextView tv_cast;
     private TextView tv_desc;
-
+    private Boolean ifLike = false;
+    //db
+    MyDBHelper dbHelper;
+    SQLiteDatabase db;
+    String name;
+    String picUrl;
+    String desc;
+    String cast;
+    String youtube;
     //Youtube
     public static final String API_KEY = "AIzaSyCRzFbaJ9BMMuwPGOhcBRxUcYGU28J0UMA";
-    //https://www.youtube.com/watch?v=<video_id>
-    public String VIDEO_ID = "OsUr8N7t4zc";
+    public String VIDEO_ID = "";
     YouTubePlayer y2;
     private YouTubePlayerView mYoutubePlayerView;
 
@@ -65,37 +75,60 @@ public class MovieActivity  extends YouTubeBaseActivity implements YouTubePlayer
 
         btn_back.setImageResource(R.drawable.ic_back);
         btn_menu.setImageResource(R.drawable.ic_menuwhite);
-        btn_like.setImageResource(R.drawable.ic_startempty);
+
+
+        dbHelper = new MyDBHelper(this);
+        db = dbHelper.getWritableDatabase();
 
         Intent intent = getIntent();
         //title
-        String name = intent.getStringExtra("NAME");
+        name = intent.getStringExtra("NAME");
         title.setText(name);
+        //set star
+        String sql = "SELECT * FROM " + MyDBHelper.getDatabaseTable() +" WHERE TRIM(mName) = '"+name.trim()+"'";
+        Cursor c = db.rawQuery(sql, null);
+
+        if (c.getCount() == 0) {
+            btn_like.setImageResource(R.drawable.ic_startempty);
+            ifLike = false;
+        } else {
+            btn_like.setImageResource(R.drawable.ic_starfull);
+            ifLike = true;
+        }
+
         //pic
         String where = intent.getStringExtra("WHERE");
         Bitmap pic = null;
         switch (where) {
             case "INFO":
                 pic = InformationActivity.getPassPic();
+                InformationActivity.setPassPic(null);
                 break;
             case "SEARCH":
                 pic = SearchActivity.getPassPic();
+                SearchActivity.setPassPic(null);
                 break;
             case "SORT":
+                pic = SortedMovie.getPassPic();
+                SortedMovie.setPassPic(null);
                 break;
             case "HOT":
                 pic = TrailerActivity.getPassPic();
+                TrailerActivity.setPassPic(null);
+                break;
+            case "LIKE":
+                pic = LikeActivity.getPassPic();
+                LikeActivity.setPassPic(null);
                 break;
         }
 
-        img_pic.setImageBitmap(pic);
-        InformationActivity.setPassPic(null);
-        //tv_desc
-        String desc = intent.getStringExtra("DESC");
-        tv_desc.setText(desc);
-        //tv_cast
-        String cast = intent.getStringExtra("CAST");
+        picUrl = intent.getStringExtra("PICURL");
+        cast = intent.getStringExtra("CAST");
+        desc = intent.getStringExtra("DESC");
+        //set item
         cast = cast.replaceAll(",", "\n");
+        img_pic.setImageBitmap(pic);
+        tv_desc.setText(desc);
         tv_cast.setText(cast);
 
         //btn_desc
@@ -127,7 +160,7 @@ public class MovieActivity  extends YouTubeBaseActivity implements YouTubePlayer
         });
 
         //youtube
-        String youtube = intent.getStringExtra("YOUTUBE");
+        youtube = intent.getStringExtra("YOUTUBE");
         VIDEO_ID = youtube.substring(youtube.indexOf('=') + 1);
         btn_youtube.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -179,16 +212,21 @@ public class MovieActivity  extends YouTubeBaseActivity implements YouTubePlayer
 
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
+                        Intent intent;
                         switch (item.getItemId()) {
                             case R.id.action_1:
-                                Intent intent = new Intent();
+                                intent = new Intent();
                                 intent.setClass(MovieActivity.this, MainActivity.class);
                                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                                 startActivity(intent);
                                 finish();
                                 break;
                             case R.id.action_2:
-
+                                intent = new Intent();
+                                intent.setClass(MovieActivity.this, LikeActivity.class);
+                                startActivity(intent);
+                                break;
+                            case R.id.action_3:
                                 break;
                         }
                         return true;
@@ -196,6 +234,32 @@ public class MovieActivity  extends YouTubeBaseActivity implements YouTubePlayer
 
                 });
                 popupmenu.show();
+            }
+        });
+
+        //btn_like
+        btn_like.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (ifLike) {
+                    //delete db
+                    ifLike = false;
+                    btn_like.setImageResource(R.drawable.ic_startempty);
+                    db.delete(MyDBHelper.getDatabaseTable(), "mName = ?",new String[] {name});
+                    Toast.makeText(MovieActivity.this,"已取消收藏",Toast.LENGTH_SHORT).show();
+                } else {
+                    //insert db
+                    ifLike = true;
+                    btn_like.setImageResource(R.drawable.ic_starfull);
+                    ContentValues cv = new ContentValues();
+                    cv.put("mName", name);
+                    cv.put("mPicUrl", picUrl);
+                    cv.put("mCast", cast);
+                    cv.put("mDesc", desc);
+                    cv.put("mYoutube", youtube);
+                    db.insert(MyDBHelper.getDatabaseTable(), null, cv);
+                    Toast.makeText(MovieActivity.this,"已新增收藏",Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
@@ -225,5 +289,11 @@ public class MovieActivity  extends YouTubeBaseActivity implements YouTubePlayer
     @Override
     public void onInitializationFailure(YouTubePlayer.Provider provider, YouTubeInitializationResult youTubeInitializationResult) {
         //Toast.makeText(this, "Failed to initialize.", Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    protected void onDestroy() {
+        db.close();
+        super.onDestroy();
     }
 }

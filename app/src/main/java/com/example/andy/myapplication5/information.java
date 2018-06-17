@@ -5,13 +5,14 @@ import android.graphics.Bitmap;
 public class information {
 
     private String Name;
-    private Bitmap pic;
+    private Bitmap pic = null;
     private String desc;
     private String cast;
     private String youtube;
     private String sort;
     private String date;
     private String now;
+    private String picUrl;
 
     public String getName() {
         return Name;
@@ -75,5 +76,13 @@ public class information {
 
     public void setNow(String now) {
         this.now = now;
+    }
+
+    public String getPicUrl() {
+        return picUrl;
+    }
+
+    public void setPicUrl(String picUrl) {
+        this.picUrl = picUrl;
     }
 }
