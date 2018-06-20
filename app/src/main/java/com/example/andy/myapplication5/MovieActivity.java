@@ -227,6 +227,20 @@ public class MovieActivity  extends YouTubeBaseActivity implements YouTubePlayer
                                 startActivity(intent);
                                 break;
                             case R.id.action_3:
+                                android.app.AlertDialog.Builder ad = new android.app.AlertDialog.Builder(MovieActivity.this);
+                                ad.setTitle("關於程式");
+                                ad.setMessage("程式名稱 : FeatureMovies\n作者 : 莊文明、徐弘欣、邱泓嶧");
+
+
+                                DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                                    }
+                                };
+
+                                ad.setPositiveButton("OK",listener);
+                                ad.show();
                                 break;
                         }
                         return true;

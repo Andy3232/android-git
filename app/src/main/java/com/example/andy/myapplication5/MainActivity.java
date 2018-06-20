@@ -1,5 +1,7 @@
 package com.example.andy.myapplication5;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -11,7 +13,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import android.content.Context;
 import org.w3c.dom.Text;
 
 
@@ -43,8 +45,23 @@ public class MainActivity extends AppCompatActivity {
                                 startActivity(intent);
                                 break;
                             case R.id.action_3:
-                                //about
+                                AlertDialog.Builder ad = new AlertDialog.Builder(MainActivity.this);
+                                ad.setTitle("關於程式");
+                                ad.setMessage("程式名稱 : FeatureMovies\n作者 : 莊文明、徐弘欣、邱泓嶧");
+
+
+                                DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                                    }
+                                };
+
+                                ad.setPositiveButton("OK",listener);
+                                ad.show();
                                 break;
+
+
                         }
                         return true;
                     }

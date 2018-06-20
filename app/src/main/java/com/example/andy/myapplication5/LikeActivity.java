@@ -1,6 +1,8 @@
 package com.example.andy.myapplication5;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -114,7 +116,20 @@ public class LikeActivity extends AppCompatActivity {
                                 finish();
                                 break;
                             case R.id.action_3:
+                                AlertDialog.Builder ad = new AlertDialog.Builder(LikeActivity.this);
+                                ad.setTitle("關於程式");
+                                ad.setMessage("程式名稱 : FeatureMovies\n作者 : 莊文明、徐弘欣、邱泓嶧");
 
+
+                                DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                                    }
+                                };
+
+                                ad.setPositiveButton("OK",listener);
+                                ad.show();
                                 break;
                         }
                         return true;

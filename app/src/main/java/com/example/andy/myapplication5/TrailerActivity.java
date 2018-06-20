@@ -1,6 +1,7 @@
 package com.example.andy.myapplication5;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -233,7 +234,20 @@ public class TrailerActivity extends AppCompatActivity {
                                 startActivity(intent);
                                 break;
                             case R.id.action_3:
-                                //about
+                                android.app.AlertDialog.Builder ad = new android.app.AlertDialog.Builder(TrailerActivity.this);
+                                ad.setTitle("關於程式");
+                                ad.setMessage("程式名稱 : FeatureMovies\n作者 : 莊文明、徐弘欣、邱泓嶧");
+
+
+                                DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                                    }
+                                };
+
+                                ad.setPositiveButton("OK",listener);
+                                ad.show();
                                 break;
                         }
                         return true;
